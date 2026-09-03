@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#2a0a3d" />
+<title>Leblon Store — Painel do Gerente</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --bg:#0f0620; --bg2:#1a0a30; --card:#26103c; --card2:#31164c;
+  --roxo:#a855f7; --roxo-forte:#7c3aed; --roxo-claro:#d8b4fe;
+  --texto:#f5ecff; --muted:#b79ad0; --borda:#3d1e5c; --ok:#22c55e;
+  --grad:linear-gradient(135deg,#a855f7,#6d28d9);
+  --grad2:linear-gradient(135deg,#7c3aed,#4c1d95);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:radial-gradient(120% 60% at 50% 0%,#3a1055 0%,var(--bg) 60%);color:var(--texto);font-family:Outfit,system-ui,sans-serif;min-height:100vh}
+.login-container{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+.login-box{background:var(--bg2);border:1px solid var(--borda);border-radius:24px;padding:40px;max-width:400px;width:100%}
+.login-box .logo{font-weight:800;font-size:28px;text-align:center;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:8px}
+.login-box .sub{text-align:center;color:var(--muted);font-size:14px;margin-bottom:24px}
+.login-box input{width:100%;background:var(--card);border:1px solid var(--borda);border-radius:12px;padding:13px;color:var(--texto);font-family:inherit;font-size:15px;margin-bottom:12px;transition:all .3s}
+.login-box input:focus{outline:2px solid var(--roxo);border-color:transparent}
+.login-box .btn{width:100%;padding:14px;font-size:16px;border-radius:12px;background:var(--grad);color:#fff;border:none;font-weight:600;cursor:pointer;transition:all .3s;font-family:inherit}
+.login-box .btn:hover{transform:scale(1.02);box-shadow:0 4px 15px -4px var(--roxo)}
+.msg{font-size:13px;padding:10px;border-radius:10px;margin-bottom:12px;display:none}
+.msg.err{display:block;background:#4c1026;color:#fda4af}
+.msg.ok{display:block;background:#0f3a22;color:#86efac}
+.msg.info{display:block;background:#1a0a30;color:#d8b4fe}
+.painel-content{display:none}
+.painel-content.active{display:block}
+.wrap{padding:16px;max-width:1400px;margin:0 auto}
+.tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.tabs button{padding:10px 20px;border-radius:10px;background:var(--card);color:var(--muted);font-weight:600;font-size:14px;border:1px solid var(--borda);transition:all .3s;cursor:pointer}
+.tabs button.on{background:var(--grad);color:#fff;border-color:transparent;box-shadow:0 4px 15px -4px var(--roxo)}
+.panel{display:none}
+.panel.on{display:block}
+.card{background:var(--card);border:1px solid var(--borda);border-radius:14px;padding:16px;margin-bottom:14px}
+.card h3{margin:0 0 10px;font-size:16px}
+.row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--borda);flex-wrap:wrap}
+.row:last-child{border-bottom:none}
+.row .g{flex:1;min-width:150px}
+.row small{color:var(--muted);font-size:12px}
+.status{font-size:11px;padding:3px 9px;border-radius:999px;background:var(--card2);color:var(--roxo-claro)}
+.status.confirmado{background:#0f3a22;color:#86efac}
+.status.pendente{background:#4c3a10;color:#fde68a}
+.status.cancelado{background:#4c1026;color:#fda4af}
+.config-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:640px){.config-grid{grid-template-columns:1fr}}
+.config-item{background:var(--card2);border-radius:10px;padding:12px}
+.config-item label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}
+.config-item input,.config-item select{width:100%;background:var(--bg);border:1px solid var(--borda);border-radius:8px;padding:8px 12px;color:var(--texto);font-family:inherit;font-size:14px}
+.config-item input:focus,.config-item select:focus{outline:2px solid var(--roxo)}
+.config-item input[type="color"]{height:44px;padding:4px;cursor:pointer}
+.config-item input[type="file"]{padding:6px}
+.preview-logo{max-height:60px;margin-top:8px;border-radius:8px;background:var(--bg);padding:4px}
+.preview-imagem{max-height:120px;margin:8px 0;border-radius:10px;background:var(--bg);padding:4px;border:1px solid var(--borda)}
+.upload-area{background:var(--bg);border:2px dashed var(--borda);border-radius:10px;padding:20px;text-align:center;cursor:pointer;transition:all .3s;margin-bottom:10px}
+.upload-area:hover{border-color:var(--roxo);background:var(--card)}
+.upload-area input{display:none}
+.upload-area .icon{font-size:32px;display:block}
+.vazio{text-align:center;color:var(--muted);padding:30px 10px;font-size:14px}
+.btn{font-family:inherit;cursor:pointer;border:none;background:var(--grad);color:#fff;padding:8px 16px;border-radius:999px;font-weight:600;font-size:13px;transition:all .3s}
+.btn:hover{transform:scale(1.02);box-shadow:0 4px 15px -4px var(--roxo)}
+.btn.ghost{background:transparent;border:1px solid var(--borda);color:var(--roxo-claro)}
+.btn.ghost:hover{background:rgba(168,85,247,.08)}
+.btn.small{padding:4px 12px;font-size:11px}
+.btn.ok{background:var(--ok)}
+.btn.danger{background:#e11d48}
+.btn.warning{background:#f59e0b}
+.btn.full{width:100%;padding:14px;font-size:16px;border-radius:12px}
+.modal{position:fixed;inset:0;z-index:60;background:rgba(8,2,14,.85);display:none;align-items:center;justify-content:center}
+.modal.on{display:flex}
+.sheet{background:var(--bg2);width:100%;max-width:700px;border-radius:20px;padding:24px;border:1px solid var(--borda);max-height:90vh;overflow:auto}
+.sheet h2{margin:0 0 14px;font-size:19px}
+.sheet textarea{width:100%;background:var(--card);border:1px solid var(--borda);border-radius:12px;padding:13px;color:var(--texto);font-family:inherit;font-size:15px;margin-bottom:10px;min-height:80px;resize:vertical}
+.detalhe-cliente{background:var(--card2);border-radius:10px;padding:14px;margin:10px 0}
+.detalhe-cliente strong{color:var(--roxo-claro)}
+.detalhe-cliente .label{color:var(--muted);font-size:12px}
+</style>
+</head>
+<body>
+
+<!-- TELA DE LOGIN -->
+<div class="login-container" id="loginScreen">
+  <div class="login-box">
+    <div class="logo">leblon <span style="color:var(--roxo-claro)">store</span></div>
+    <div class="sub">🔐 Painel do Gerente</div>
+    <div class="msg" id="msgLogin"></div>
+    <input type="text" id="loginUsuario" placeholder="Usuário" />
+    <input type="password" id="loginSenha" placeholder="Senha" />
+    <button class="btn" onclick="fazerLogin()">Entrar no Painel</button>
+  </div>
+</div>
+
+<!-- PAINEL -->
+<div class="painel-content" id="painelContent">
+  <header style="position:sticky;top:0;z-index:30;background:rgba(15,6,32,.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--borda);padding:12px 20px;display:flex;align-items:center;gap:15px;flex-wrap:wrap">
+    <span style="font-weight:800;font-size:22px;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent">leblon <span style="color:var(--roxo-claro);-webkit-text-fill-color:var(--roxo-claro)">store</span></span>
+    <div style="flex:1"></div>
+    <span style="font-size:13px;color:var(--muted)" id="gerenteNome">Gerente</span>
+    <button class="btn ghost" onclick="sair()" style="padding:6px 14px;font-size:12px">🚪 Sair</button>
+  </header>
+
+  <main class="wrap">
+    <div class="tabs" id="tabs">
+      <button class="on" data-tab="pedidos">📦 Pedidos</button>
+      <button data-tab="produtos">🛍️ Produtos</button>
+      <button data-tab="streaming">📺 Streaming</button>
+      <button data-tab="usuarios">👥 Usuários</button>
+      <button data-tab="logs">📋 Logs</button>
+      <button data-tab="config">⚙️ Configurações</button>
+    </div>
+
+    <!-- PEDIDOS -->
+    <div class="panel on" id="panelPedidos">
+      <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+        <button class="btn small" onclick="filtrarPedidos('todos')">Todos</button>
+        <button class="btn small ghost" onclick="filtrarPedidos('pendente')">⏳ Pendentes</button>
+        <button class="btn small ok" onclick="filtrarPedidos('confirmado')">✅ Confirmados</button>
+        <button class="btn small danger" onclick="filtrarPedidos('cancelado')">❌ Cancelados</button>
+        <button class="btn small warning" onclick="carregarPedidos()">🔄 Atualizar</button>
+      </div>
+      <div id="listaPedidos" class="vazio">Carregando pedidos...</div>
+    </div>
+
+    <!-- PRODUTOS -->
+    <div class="panel" id="panelProdutos">
+      <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+        <button class="btn" onclick="abrirModalProduto()">➕ Novo Produto</button>
+        <button class="btn ghost small" onclick="carregarProdutos()">🔄 Atualizar</button>
+      </div>
+      <div id="listaProdutos" class="vazio">Carregando produtos...</div>
+    </div>
+
+    <!-- STREAMING -->
+    <div class="panel" id="panelStreaming">
+      <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+        <button class="btn" onclick="abrirModalStreaming()">➕ Novo Streaming</button>
+        <button class="btn ghost small" onclick="carregarStreaming()">🔄 Atualizar</button>
+      </div>
+      <div id="listaStreaming" class="vazio">Carregando streaming...</div>
+    </div>
+
+    <!-- USUÁRIOS -->
+    <div class="panel" id="panelUsuarios">
+      <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+        <button class="btn" onclick="abrirModalUsuario()">➕ Novo Usuário</button>
+        <button class="btn ghost small" onclick="carregarUsuarios()">🔄 Atualizar</button>
+      </div>
+      <div id="listaUsuarios" class="vazio">Carregando usuários...</div>
+    </div>
+
+    <!-- LOGS -->
+    <div class="panel" id="panelLogs">
+      <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+        <button class="btn ghost small" onclick="carregarLogs()">🔄 Atualizar</button>
+        <button class="btn danger small" onclick="limparLogs()">🗑️ Limpar Logs</button>
+      </div>
+      <div id="listaLogs" class="vazio">Carregando logs...</div>
+    </div>
+
+    <!-- CONFIGURAÇÕES -->
+    <div class="panel" id="panelConfig">
+      <div class="card">
+        <h3>🎨 Aparência do Site</h3>
+        <div class="config-grid">
+          <div class="config-item">
+            <label>Logo da Loja</label>
+            <input type="file" id="logoInput" accept="image/*" onchange="uploadLogo(event)" />
+            <img id="logoPreviewConfig" class="preview-logo" src="https://placehold.co/200x80/a855f7/ffffff?text=LEBLON" />
+          </div>
+          <div class="config-item">
+            <label>Nome da Loja</label>
+            <input type="text" id="storeNameInput" value="Leblon Store" onchange="salvarConfig()" />
+          </div>
+          <div class="config-item">
+            <label>Cor Principal</label>
+            <input type="color" id="corPrincipal" value="#a855f7" onchange="salvarConfig()" />
+          </div>
+          <div class="config-item">
+            <label>Cor Secundária</label>
+            <input type="color" id="corSecundaria" value="#7c3aed" onchange="salvarConfig()" />
+          </div>
+          <div class="config-item">
+            <label>Cor de Fundo</label>
+            <input type="color" id="corFundo" value="#0f0620" onchange="salvarConfig()" />
+          </div>
+          <div class="config-item">
+            <label>Cor do Texto</label>
+            <input type="color" id="corTexto" value="#f5ecff" onchange="salvarConfig()" />
+          </div>
+          <div class="config-item">
+            <label>Chave PIX</label>
+            <input type="text" id="chavePixInput" value="615add06-24f5-421f-8ac1-cc3e0a52f60c" onchange="salvarConfig()" />
+          </div>
+          <div class="config-item">
+            <label>WhatsApp (com DDD)</label>
+            <input type="text" id="whatsappInput" value="5511999999999" onchange="salvarConfig()" />
+          </div>
+        </div>
+        <button class="btn" onclick="salvarConfig()" style="margin-top:12px">💾 Salvar Configurações</button>
+        <button class="btn ghost" onclick="resetarConfig()" style="margin-top:8px;margin-left:8px">↩️ Restaurar Padrão</button>
+      </div>
+      <div class="card">
+        <h3>📊 Estatísticas</h3>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px">
+          <div class="config-item"><strong>Total Pedidos</strong><br><span id="totalPedidos">0</span></div>
+          <div class="config-item"><strong>Confirmados</strong><br><span id="totalConfirmados">0</span></div>
+          <div class="config-item"><strong>Pendentes</strong><br><span id="totalPendentes">0</span></div>
+          <div class="config-item"><strong>Cancelados</strong><br><span id="totalCancelados">0</span></div>
+          <div class="config-item"><strong>Total Usuários</strong><br><span id="totalUsuarios">0</span></div>
+          <div class="config-item"><strong>Total Produtos</strong><br><span id="totalProdutos">0</span></div>
+          <div class="config-item"><strong>Total Streaming</strong><br><span id="totalStreaming">0</span></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- MODAL PRODUTO -->
+<div class="modal" id="mProduto">
+  <div class="sheet">
+    <h2 id="produtoModalTitle">➕ Novo Produto</h2>
+    <div class="msg" id="msgProduto"></div>
+    <input type="hidden" id="produtoId" />
+    <input id="pNome" placeholder="Nome do produto" />
+    <input id="pDesc" placeholder="Descrição" />
+    <input id="pPreco" placeholder="Preço (ex: 150,00)" />
+    <input id="pCategoria" placeholder="Categoria (ex: cabelo, personagem)" />
+    <div class="upload-area" onclick="document.getElementById('pImagemFile').click()">
+      <span class="icon">🖼️</span>
+      <span>Clique para selecionar uma imagem</span>
+      <span style="font-size:12px;color:var(--muted)">PNG, JPG, GIF - Máx 5MB</span>
+      <input type="file" id="pImagemFile" accept="image/*" onchange="previewImagemProduto(event)" />
+    </div>
+    <img id="pImagemPreview" class="preview-imagem" style="display:none" />
+    <input id="pImagem" placeholder="URL da imagem (ou faça upload)" style="margin-top:8px" />
+    <div style="margin:10px 0">
+      <label style="color:var(--muted);font-size:13px">
+        <input type="checkbox" id="pAdulto" /> 🔞 Conteúdo +18
+      </label>
+    </div>
+    <button class="btn full" onclick="salvarProduto()">💾 Salvar Produto</button>
+    <button class="btn ghost full" style="margin-top:8px" onclick="fecharModal('mProduto')">Cancelar</button>
+  </div>
+</div>
+
+<!-- MODAL STREAMING -->
+<div class="modal" id="mStreaming">
+  <div class="sheet">
+    <h2 id="streamingModalTitle">➕ Novo Streaming</h2>
+    <div class="msg" id="msgStreaming"></div>
+    <input type="hidden" id="streamingId" />
+    <input id="sNome" placeholder="Nome do canal/assinatura" />
+    <input id="sDesc" placeholder="Descrição" />
+    <input id="sPreco" placeholder="Preço (ex: 150,00)" />
+    <input id="sTipo" placeholder="Tipo (ex: Canal, Assinatura, App)" />
+    <input id="sCategoria" placeholder="Categoria (ex: Filmes, Esportes, Séries)" />
+    <div class="upload-area" onclick="document.getElementById('sImagemFile').click()">
+      <span class="icon">🖼️</span>
+      <span>Clique para selecionar uma imagem</span>
+      <span style="font-size:12px;color:var(--muted)">PNG, JPG, GIF - Máx 5MB</span>
+      <input type="file" id="sImagemFile" accept="image/*" onchange="previewImagemStreaming(event)" />
+    </div>
+    <img id="sImagemPreview" class="preview-imagem" style="display:none" />
+    <input id="sImagem" placeholder="URL da imagem (ou faça upload)" style="margin-top:8px" />
+    <button class="btn full" onclick="salvarStreaming()">💾 Salvar Streaming</button>
+    <button class="btn ghost full" style="margin-top:8px" onclick="fecharModal('mStreaming')">Cancelar</button>
+  </div>
+</div>
+
+<!-- MODAL USUÁRIO -->
+<div class="modal" id="mUsuario">
+  <div class="sheet">
+    <h2 id="usuarioModalTitle">➕ Novo Usuário</h2>
+    <div class="msg" id="msgUsuario"></div>
+    <input type="hidden" id="usuarioId" />
+    <input id="uNome" placeholder="Nome completo" />
+    <input id="uEmail" type="email" placeholder="Email" />
+    <input id="uSenha" type="password" placeholder="Senha" />
+    <input id="uTipo" placeholder="Tipo (admin, cliente, etc)" />
+    <button class="btn full" onclick="salvarUsuario()">💾 Salvar Usuário</button>
+    <button class="btn ghost full" style="margin-top:8px" onclick="fecharModal('mUsuario')">Cancelar</button>
+  </div>
+</div>
+
+<!-- MODAL DETALHES DO PEDIDO -->
+<div class="modal" id="mDetalhes">
+  <div class="sheet">
+    <h2>📋 Detalhes do Pedido</h2>
+    <div id="detalhesConteudo"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">
+      <button class="btn ok" onclick="confirmarPedidoDetalhes()" id="btnConfirmarDetalhes">✅ Confirmar</button>
+      <button class="btn danger" onclick="cancelarPedidoDetalhes()" id="btnCancelarDetalhes">❌ Cancelar</button>
+      <button class="btn warning" onclick="excluirPedidoDetalhes()" id="btnExcluirDetalhes">🗑️ Excluir</button>
+    </div>
+    <button class="btn ghost full" style="margin-top:8px" onclick="fecharModal('mDetalhes')">Fechar</button>
+  </div>
+</div>
+
+<script>
+const API = location.port === '5000' || location.protocol === 'file:' ? 'http://localhost:5000' : '';
+let produtos = [], pedidos = [], usuarios = [], streaming = [], logs = [];
+let filtroPedido = 'todos', produtoEditando = null, usuarioEditando = null, streamingEditando = null;
+let config = {};
+let gerenteLogado = false;
+let pedidoSelecionado = null;
+let imagemBase64 = null;
+
+// ---------- LOGIN ----------
+async function fazerLogin() {
+  const usuario = document.getElementById('loginUsuario').value.trim();
+  const senha = document.getElementById('loginSenha').value.trim();
+  const msg = document.getElementById('msgLogin');
+
+  if (!usuario || !senha) {
+    msg.className = 'msg err';
+    msg.textContent = 'Preencha usuário e senha';
+    return;
+  }
+
+  msg.className = 'msg info';
+  msg.textContent = 'Autenticando...';
+
+  try {
+    const r = await fetch(API + '/api/gerente/login', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      credentials: 'include',
+      body: JSON.stringify({email: usuario, usuario: usuario, senha: senha})
+    });
+    const d = await r.json();
+
+    if (!r.ok) {
+      msg.className = 'msg err';
+      msg.textContent = d.erro || 'Credenciais inválidas';
+      return;
+    }
+
+    gerenteLogado = true;
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('painelContent').classList.add('active');
+    document.getElementById('gerenteNome').textContent = d.usuario?.nome || 'Gerente';
+
+    carregarConfig();
+    carregarPedidos();
+    carregarProdutos();
+    carregarStreaming();
+    carregarUsuarios();
+    carregarLogs();
+    carregarStats();
+
+  } catch(e) {
+    msg.className = 'msg err';
+    msg.textContent = 'Erro ao conectar com o servidor: ' + e.message;
+  }
+}
+
+async function sair() {
+  if (!confirm('Deseja sair do painel?')) return;
+  try {
+    await fetch(API + '/api/gerente/logout', {
+      method: 'POST',
+      credentials: 'include'
+    });
+  } catch(e) {}
+  gerenteLogado = false;
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('painelContent').classList.remove('active');
+}
+
+// ---------- TOAST ----------
+function toast(msg) {
+  const el = document.createElement('div');
+  el.style.cssText = 'position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:var(--bg2);border:1px solid var(--borda);padding:12px 24px;border-radius:12px;z-index:70;animation:fadeIn .3s ease;text-align:center;color:var(--texto)';
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 3000);
+}
+
+// ---------- MODAIS ----------
+function abrirModal(id) { document.getElementById(id).classList.add('on'); }
+function fecharModal(id) { document.getElementById(id).classList.remove('on'); }
+
+// ---------- TABS ----------
+document.querySelectorAll('#tabs button').forEach(b => {
+  b.onclick = () => {
+    document.querySelectorAll('#tabs button').forEach(x => x.classList.remove('on'));
+    b.classList.add('on');
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('on'));
+    document.getElementById('panel' + b.dataset.tab.charAt(0).toUpperCase() + b.dataset.tab.slice(1)).classList.add('on');
+    if (b.dataset.tab === 'pedidos') carregarPedidos();
+    if (b.dataset.tab === 'produtos') carregarProdutos();
+    if (b.dataset.tab === 'streaming') carregarStreaming();
+    if (b.dataset.tab === 'usuarios') carregarUsuarios();
+    if (b.dataset.tab === 'logs') carregarLogs();
+    if (b.dataset.tab === 'config') carregarStats();
+  };
+});
+
+// ---------- CONFIG ----------
+function carregarConfig() {
+  try {
+    const saved = localStorage.getItem('leblon_config');
+    if (saved) {
+      config = JSON.parse(saved);
+      aplicarConfig();
+    }
+  } catch(e) {}
+}
+
+function aplicarConfig() {
+  const root = document.documentElement;
+  if (config.corPrincipal) root.style.setProperty('--roxo', config.corPrincipal);
+  if (config.corSecundaria) root.style.setProperty('--roxo-forte', config.corSecundaria);
+  if (config.corFundo) root.style.setProperty('--bg', config.corFundo);
+  if (config.corTexto) root.style.setProperty('--texto', config.corTexto);
+  if (config.nomeLoja) document.getElementById('storeNameInput').value = config.nomeLoja;
+  if (config.logo) document.getElementById('logoPreviewConfig').src = config.logo;
+  if (config.chavePix) document.getElementById('chavePixInput').value = config.chavePix;
+  if (config.whatsapp) document.getElementById('whatsappInput').value = config.whatsapp;
+
+  document.getElementById('corPrincipal').value = config.corPrincipal || '#a855f7';
+  document.getElementById('corSecundaria').value = config.corSecundaria || '#7c3aed';
+  document.getElementById('corFundo').value = config.corFundo || '#0f0620';
+  document.getElementById('corTexto').value = config.corTexto || '#f5ecff';
+}
+
+function salvarConfig() {
+  config.nomeLoja = document.getElementById('storeNameInput').value;
+  config.corPrincipal = document.getElementById('corPrincipal').value;
+  config.corSecundaria = document.getElementById('corSecundaria').value;
+  config.corFundo = document.getElementById('corFundo').value;
+  config.corTexto = document.getElementById('corTexto').value;
+  config.chavePix = document.getElementById('chavePixInput').value;
+  config.whatsapp = document.getElementById('whatsappInput').value;
+
+  localStorage.setItem('leblon_config', JSON.stringify(config));
+  aplicarConfig();
+  toast('✅ Configurações salvas!');
+}
+
+function resetarConfig() {
+  localStorage.removeItem('leblon_config');
+  config = {};
+  document.getElementById('storeNameInput').value = 'Leblon Store';
+  document.getElementById('corPrincipal').value = '#a855f7';
+  document.getElementById('corSecundaria').value = '#7c3aed';
+  document.getElementById('corFundo').value = '#0f0620';
+  document.getElementById('corTexto').value = '#f5ecff';
+  document.getElementById('chavePixInput').value = '615add06-24f5-421f-8ac1-cc3e0a52f60c';
+  document.getElementById('whatsappInput').value = '5511999999999';
+  document.getElementById('logoPreviewConfig').src = 'https://placehold.co/200x80/a855f7/ffffff?text=LEBLON';
+  salvarConfig();
+  toast('↩️ Configurações restauradas!');
+}
+
+function uploadLogo(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    config.logo = ev.target.result;
+    document.getElementById('logoPreviewConfig').src = ev.target.result;
+    localStorage.setItem('leblon_config', JSON.stringify(config));
+    toast('✅ Logo atualizada!');
+  };
+  reader.readAsDataURL(file);
+}
+
+// ---------- UPLOAD IMAGEM ----------
+function previewImagemProduto(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) {
+    toast('❌ Imagem muito grande! Máximo 5MB');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    imagemBase64 = e.target.result;
+    document.getElementById('pImagemPreview').src = imagemBase64;
+    document.getElementById('pImagemPreview').style.display = 'block';
+    document.getElementById('pImagem').value = imagemBase64;
+  };
+  reader.readAsDataURL(file);
+}
+
+function previewImagemStreaming(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) {
+    toast('❌ Imagem muito grande! Máximo 5MB');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    imagemBase64 = e.target.result;
+    document.getElementById('sImagemPreview').src = imagemBase64;
+    document.getElementById('sImagemPreview').style.display = 'block';
+    document.getElementById('sImagem').value = imagemBase64;
+  };
+  reader.readAsDataURL(file);
+}
+
+// ---------- PEDIDOS ----------
+async function carregarPedidos() {
+  const el = document.getElementById('listaPedidos');
+  el.className = 'vazio';
+  el.textContent = 'Carregando...';
+  try {
+    const r = await fetch(API + '/api/gerente/pedidos', {
+      credentials: 'include'
+    });
+    if (!r.ok) {
+      if (r.status === 401) {
+        el.textContent = '🔐 Sessão expirada. Faça login novamente.';
+        return;
+      }
+      throw new Error('Não autorizado');
+    }
+    const d = await r.json();
+    pedidos = d.erro ? [] : d;
+    renderPedidos();
+  } catch(e) {
+    el.textContent = '❌ Erro ao carregar pedidos: ' + e.message;
+  }
+}
+
+function renderPedidos() {
+  const el = document.getElementById('listaPedidos');
+  let lista = pedidos;
+  if (filtroPedido !== 'todos') {
+    lista = pedidos.filter(p => p.status.toLowerCase() === filtroPedido);
+  }
+  if (!lista.length) {
+    el.className = 'vazio';
+    el.textContent = '📭 Nenhum pedido ' + (filtroPedido !== 'todos' ? filtroPedido : '') + ' encontrado.';
+    return;
+  }
+  el.className = '';
+  el.innerHTML = lista.map(p => `
+    <div class="row">
+      <div class="g">
+        <strong>${p.pedido || 'Sem descrição'}</strong>
+        <small>#${p.id} • ${p.nome || 'Anônimo'}</small>
+      </div>
+      <span class="status ${p.status.toLowerCase()}">${p.status}</span>
+      <button class="btn small ghost" onclick="verDetalhes(${p.id})">📋 Detalhes</button>
+    </div>
+  `).join('');
+}
+
+function filtrarPedidos(filtro) {
+  filtroPedido = filtro;
+  renderPedidos();
+}
+
+function verDetalhes(id) {
+  const pedido = pedidos.find(p => p.id === id);
+  if (!pedido) return;
+  pedidoSelecionado = pedido;
+
+  const el = document.getElementById('detalhesConteudo');
+  el.innerHTML = `
+    <div class="detalhe-cliente">
+      <span class="label">🆔 Pedido #</span>
+      <strong>${pedido.id}</strong>
+    </div>
+    <div class="detalhe-cliente">
+      <span class="label">👤 Cliente</span>
+      <strong>${pedido.nome || 'Anônimo'}</strong>
+    </div>
+    <div class="detalhe-cliente">
+      <span class="label">📦 Produtos</span>
+      <strong>${pedido.pedido || 'Sem descrição'}</strong>
+    </div>
+    <div class="detalhe-cliente">
+      <span class="label">📌 Status</span>
+      <strong style="color:${pedido.status.toLowerCase() === 'confirmado' ? '#86efac' : pedido.status.toLowerCase() === 'cancelado' ? '#fda4af' : '#fde68a'}">${pedido.status}</strong>
+    </div>
+    <div class="detalhe-cliente">
+      <span class="label">📅 Data</span>
+      <strong>${pedido.data || new Date().toLocaleString('pt-BR')}</strong>
+    </div>
+  `;
+
+  const btnConfirmar = document.getElementById('btnConfirmarDetalhes');
+  const btnCancelar = document.getElementById('btnCancelarDetalhes');
+  const btnExcluir = document.getElementById('btnExcluirDetalhes');
+
+  if (pedido.status.toLowerCase() === 'confirmado') {
+    btnConfirmar.style.display = 'none';
+    btnCancelar.style.display = 'inline-block';
+    btnExcluir.style.display = 'inline-block';
+  } else if (pedido.status.toLowerCase() === 'cancelado') {
+    btnConfirmar.style.display = 'inline-block';
+    btnCancelar.style.display = 'none';
+    btnExcluir.style.display = 'inline-block';
+  } else {
+    btnConfirmar.style.display = 'inline-block';
+    btnCancelar.style.display = 'inline-block';
+    btnExcluir.style.display = 'inline-block';
+  }
+
+  abrirModal('mDetalhes');
+}
+
+async function confirmarPedidoDetalhes() {
+  if (!pedidoSelecionado) return;
+  try {
+    const r = await fetch(API + '/api/gerente/pedidos/' + pedidoSelecionado.id, {
+      method: 'PUT',
+      headers: {'Content-Type': 'application/json'},
+      credentials: 'include',
+      body: JSON.stringify({status: 'Confirmado'})
+    });
+    if (!r.ok) throw new Error('Erro ao confirmar');
+    fecharModal('mDetalhes');
+    toast('✅ Pedido #' + pedidoSelecionado.id + ' confirmado!');
+    carregarPedidos();
+    carregarStats();
+    adicionarLog(`Pedido #${pedidoSelecionado.id} confirmado por ${pedidoSelecionado.nome}`);
+  } catch(e) {
+    toast('❌ Erro ao confirmar pedido: ' + e.message);
+  }
+}
+
+async function cancelarPedidoDetalhes() {
+  if (!pedidoSelecionado) return;
+  try {
+    const r = await fetch(API + '/api/gerente/pedidos/' + pedidoSelecionado.id, {
+      method: 'PUT',
+      headers: {'Content-Type': 'application/json'},
+      credentials: 'include',
+      body: JSON.stringify({status: 'Cancelado'})
+    });
+    if (!r.ok) throw new Error('Erro ao cancelar');
+    fecharModal('mDetalhes');
+    toast('❌ Pedido #' + pedidoSelecionado.id + ' cancelado!');
+    carregarPedidos();
+    carregarStats();
+    adicionarLog(`Pedido #${pedidoSelecionado.id} cancelado por ${pedidoSelecionado.nome}`);
+  } catch(e) {
+    toast('❌ Erro ao cancelar pedido: ' + e.message);
+  }
+}
+
+async function excluirPedidoDetalhes() {
+  if (!pedidoSelecionado) return;
+  if (!confirm('Tem certeza que deseja EXCLUIR permanentemente o pedido #' + pedidoSelecionado.id + '?')) return;
+  try {
+    const r = await fetch(API + '/api/gerente/pedidos/' + pedidoSelecionado.id, {
+      method: 'DELETE',
+      credentials: 'include'
+    });
+    if (!r.ok) throw new Error('Erro ao excluir');
+    fecharModal('mDetalhes');
+    toast('🗑️ Pedido #' + pedidoSelecionado.id + ' excluído permanentemente!');
+    carregarPedidos();
+    carregarStats();
+    adicionarLog(`Pedido #${pedidoSelecionado.id} excluído permanentemente por ${pedidoSelecionado.nome}`);
+  } catch(e) {
+    toast('❌ Erro ao excluir pedido: ' + e.message);
+  }
+}
+
+// ---------- PRODUTOS ----------
+async function carregarProdutos() {
+  const el = document.getElementById('listaProdutos');
+  el.className = 'vazio';
+  el.textContent = 'Carregando...';
+  try {
+    const [r1, r2] = await Promise.all([
+      fetch(API + '/api/produtos'),
+      fetch(API + '/api/produtos18')
+    ]);
+    const d1 = await r1.json();
+    const d2 = await r2.json();
+    produtos = [...(d1.erro ? [] : d1), ...(d2.erro ? [] : d2)];
+    renderProdutos();
+    document.getElementById('totalProdutos').textContent = produtos.length;
+  } catch(e) {
+    el.textContent = '❌ Erro ao carregar produtos.';
+  }
+}
+
+function renderProdutos() {
+  const el = document.getElementById('listaProdutos');
+  if (!produtos.length) {
+    el.className = 'vazio';
+    el.textContent = '📭 Nenhum produto cadastrado.';
+    return;
+  }
+  el.className = '';
+  el.innerHTML = produtos.map(p => `
+    <div class="row">
+      <img src="${p.imagem || 'https://placehold.co/60x60/26103c/d8b4fe?text=IMG'}" style="width:50px;height:50px;border-radius:8px;object-fit:cover;background:var(--card2)" />
+      <div class="g">
+        <strong>${p.nome}</strong>
+        <small>${p.categoria || 'Sem categoria'} ${p.adulto ? '🔞' : ''}</small>
+        <br><small style="color:var(--roxo-claro)">R$ ${parseFloat(p.preco || 0).toFixed(2).replace('.', ',')}</small>
+      </div>
+      <button class="btn small ghost" onclick="editarProduto(${p.id})">✏️</button>
+      <button class="btn small danger" onclick="excluirProduto(${p.id})">🗑️</button>
+    </div>
+  `).join('');
+}
+
+function abrirModalProduto() {
+  produtoEditando = null;
+  document.getElementById('produtoModalTitle').textContent = '➕ Novo Produto';
+  document.getElementById('produtoId').value = '';
+  document.getElementById('pNome').value = '';
+  document.getElementById('pDesc').value = '';
+  document.getElementById('pPreco').value = '';
+  document.getElementById('pCategoria').value = '';
+  document.getElementById('pImagem').value = '';
+  document.getElementById('pAdulto').checked = false;
+  document.getElementById('msgProduto').className = 'msg';
+  document.getElementById('pImagemPreview').style.display = 'none';
+  abrirModal('mProduto');
+}
+
+function editarProduto(id) {
+  const p = produtos.find(x => x.id == id);
+  if (!p) return;
+  produtoEditando = p;
+  document.getElementById('produtoModalTitle').textContent = '✏️ Editar Produto';
+  document.getElementById('produtoId').value = p.id;
+  document.getElementById('pNome').value = p.nome || '';
+  document.getElementById('pDesc').value = p.descricao || '';
+  document.getElementById('pPreco').value = p.preco || '';
+  document.getElementById('pCategoria').value = p.categoria || '';
+  document.getElementById('pImagem').value = p.imagem || '';
+  document.getElementById('pAdulto').checked = p.adulto || false;
+  document.getElementById('msgProduto').className = 'msg';
+
+  if (p.imagem) {
+    document.getElementById('pImagemPreview').src = p.imagem;
+    document.getElementById('pImagemPreview').style.display = 'block';
+  } else {
+    document.getElementById('pImagemPreview').style.display = 'none';
+  }
+
+  abrirModal('mProduto');
+}
+
+async function salvarProduto() {
+  const id = document.getElementById('produtoId').value;
+  const dados = {
+    nome: document.getElementById('pNome').value,
+    descricao: document.getElementById('pDesc').value,
+    preco: document.getElementById('pPreco').value,
+    categoria: document.getElementById('pCategoria').value,
+    imagem: document.getElementById('pImagem').value || null,
+    adulto: document.getElementById('pAdulto').checked
+  };
+
+  if (!dados.nome) {
+    document.getElementById('msgProduto').className = 'msg err';
+    document.getElementById('msgProduto').textContent = 'Nome é obrigatório';
+    return;
+  }
+
+  const msg = document.getElementById('msgProduto');
+  msg.className = 'msg info';
+  msg.textContent = 'Salvando...';
+
+  try {
+    const rota = id ? `/api/gerente/produtos/${id}` : '/api/gerente/produtos';
+    const metodo = id ? 'PUT' : 'POST';
+    const r = await fetch(API + rota, {
+      method: metodo,
+      headers: {'Content-Type': 'application/json'},
+      credentials: 'include',
+      body: JSON.stringify(dados)
+    });
+    if (!r.ok) throw new Error('Erro ao salvar');
+    msg.className = 'msg ok';
+    msg.textContent = '✅ Produto salvo!';
+    setTimeout(() => {
+      fecharModal('mProduto');
+      toast('✅ Produto salvo com sucesso!');
+      carregarProdutos();
+      adicionarLog(`${id ? 'Editado' : 'Criado'} produto: ${dados.nome}`);
+    }, 500);
+  } catch(e) {
+    msg.className = 'msg err';
+    msg.textContent = '❌ Erro ao salvar produto: ' + e.message;
+  }
+}
+
+async function excluirProduto(id) {
+  if (!confirm('Tem certeza que deseja excluir este produto?')) return;
+  try {
+    const r = await fetch(API + '/api/gerente/produtos/' + id, {
+      method: 'DELETE',
+      credentials: 'include'
+    });
+    if (!r.ok) throw new Error('Erro ao excluir');
+    toast('🗑️ Produto excluído!');
+    carregarProdutos();
+    adicionarLog(`Produto #${id} excluído`);
+  } catch(e) {
+    toast('❌ Erro ao excluir produto: ' + e.message);
+  }
+}
+
+// ---------- STREAMING ----------
+async function carregarStreaming() {
+  const el = document.getElementById('listaStreaming');
+  el.className = 'vazio';
+  el.textContent = 'Carregando...';
+  try {
+    const r = await fetch(API + '/api/gerente/streaming', {
+      credentials: 'include'
+    });
+    if (!r.ok) throw new Error('Erro ao carregar');
+    const d = await r.json();
+    streaming = d.erro ? [] : d;
+    renderStreaming();
+    document.getElementById('totalStreaming').textContent = streaming.length;
+  } catch(e) {
+    el.textContent = '❌ Erro ao carregar streaming: ' + e.message;
+  }
+}
+
+function renderStreaming() {
+  const el = document.getElementById('listaStreaming');
+  if (!streaming.length) {
+    el.className = 'vazio';
+    el.textContent = '📭 Nenhum item de streaming cadastrado.';
+    return;
+  }
+  el.className = '';
+  el.innerHTML = streaming.map(s => `
+    <div class="row">
+      <img src="${s.imagem || 'https://placehold.co/60x60/31164c/d8b4fe?text=STREAM'}" style="width:50px;height:50px;border-radius:8px;object-fit:cover;background:var(--card2)" />
+      <div class="g">
+        <strong>${s.nome}</strong>
+        <small>${s.tipo || 'Streaming'} • ${s.categoria || 'Sem categoria'}</small>
+        <br><small style="color:var(--roxo-claro)">R$ ${parseFloat(s.preco || 0).toFixed(2).replace('.', ',')}</small>
+      </div>
+      <button class="btn small ghost" onclick="editarStreaming(${s.id})">✏️</button>
+      <button class="btn small danger" onclick="excluirStreaming(${s.id})">🗑️</button>
+    </div>
+  `).join('');
+}
+
+function abrirModalStreaming() {
+  streamingEditando = null;
+  document.getElementById('streamingModalTitle').textContent = '➕ Novo Streaming';
+  document.getElementById('streamingId').value = '';
+  document.getElementById('sNome').value = '';
+  document.getElementById('sDesc').value = '';
+  document.getElementById('sPreco').value = '';
+  document.getElementById('sTipo').value = '';
+  document.getElementById('sCategoria').value = '';
+  document.getElementById('sImagem').value = '';
+  document.getElementById('msgStreaming').className = 'msg';
+  document.getElementById('sImagemPreview').style.display = 'none';
+  abrirModal('mStreaming');
+}
+
+function editarStreaming(id) {
+  const s = streaming.find(x => x.id == id);
+  if (!s) return;
+  streamingEditando = s;
+  document.getElementById('streamingModalTitle').textContent = '✏️ Editar Streaming';
+  document.getElementById('streamingId').value = s.id;
+  document.getElementById('sNome').value = s.nome || '';
+  document.getElementById('sDesc').value = s.descricao || '';
+  document.getElementById('sPreco').value = s.preco || '';
+  document.getElementById('sTipo').value = s.tipo || '';
+  document.getElementById('sCategoria').value = s.categoria || '';
+  document.getElementById('sImagem').value = s.imagem || '';
+  document.getElementById('msgStreaming').className = 'msg';
+
+  if (s.imagem) {
+    document.getElementById('sImagemPreview').src = s.imagem;
+    document.getElementById('sImagemPreview').style.display = 'block';
+  } else {
+    document.getElementById('sImagemPreview').style.display = 'none';
+  }
+
+  abrirModal('mStreaming');
+}
+
+async function salvarStreaming() {
+  const id = document.getElementById('streamingId').value;
+  const dados = {
+    nome: document.getElementById('sNome').value,
+    descricao: document.getElementById('sDesc').value,
+    preco: document.getElementById('sPreco').value,
+    tipo: document.getElementById('sTipo').value,
+    categoria: document.getElementById('sCategoria').value,
+    imagem: document.getElementById('sImagem').value || null
+  };
+
+  if (!dados.nome) {
+    document.getElementById('msgStreaming').className = 'msg err';
+    document.getElementById('msgStreaming').textContent = 'Nome é obrigatório';
+    return;
+  }
+
+  const msg = document.getElementById('msgStreaming');
+  msg.className = 'msg info';
+  msg.textContent = 'Salvando...';
+
+  try {
+    const rota = id ? `/api/gerente/streaming/${id}` : '/api/gerente/streaming';
+    const metodo = id ? 'PUT' : 'POST';
+    const r = await fetch(API + rota, {
+      method: metodo,
+      headers: {'Content-Type': 'application/json'},
+      credentials: 'include',
+      body: JSON.stringify(dados)
+    });
+    if (!r.ok) throw new Error('Erro ao salvar');
+    msg.className = 'msg ok';
+    msg.textContent = '✅ Streaming salvo!';
+    setTimeout(() => {
+      fecharModal('mStreaming');
+      toast('✅ Streaming salvo com sucesso!');
+      carregarStreaming();
+      adicionarLog(`${id ? 'Editado' : 'Criado'} streaming: ${dados.nome}`);
+    }, 500);
+  } catch(e) {
+    msg.className = 'msg err';
+    msg.textContent = '❌ Erro ao salvar streaming: ' + e.message;
+  }
+}
+
+async function excluirStreaming(id) {
+  if (!confirm('Tem certeza que deseja excluir este item de streaming?')) return;
+  try {
+    const r = await fetch(API + '/api/gerente/streaming/' + id, {
+      method: 'DELETE',
+      credentials: 'include'
+    });
+    if (!r.ok) throw new Error('Erro ao excluir');
+    toast('🗑️ Streaming excluído!');
+    carregarStreaming();
+    adicionarLog(`Streaming #${id} excluído`);
+  } catch(e) {
+    toast('❌ Erro ao excluir streaming: ' + e.message);
+  }
+}
+
+// ---------- USUÁRIOS ----------
+async function carregarUsuarios() {
+  const el = document.getElementById('listaUsuarios');
+  el.className = 'vazio';
+  el.textContent = 'Carregando...';
+  try {
+    const r = await fetch(API + '/api/gerente/usuarios', {
+      credentials: 'include'
+    });
+    if (!r.ok) throw new Error('Erro ao carregar');
+    const d = await r.json();
+    usuarios = d.erro ? [] : d;
+    renderUsuarios();
+    document.getElementById('totalUsuarios').textContent = usuarios.length;
+  } catch(e) {
+    el.textContent = '❌ Erro ao carregar usuários: ' + e.message;
+  }
+}
+
+function renderUsuarios() {
+  const el = document.getElementById('listaUsuarios');
+  if (!usuarios.length) {
+    el.className = 'vazio';
+    el.textContent = '📭 Nenhum usuário cadastrado.';
+    return;
+  }
+  el.className = '';
+  el.innerHTML = usuarios.map(u => `
+    <div class="row">
+      <div class="g">
+        <strong>${u.nome || u.usuario || 'Sem nome'}</strong>
+        <small>${u.email || u.usuario || ''}</small>
+        <br><small style="color:var(--roxo-claro)">${u.tipo || 'Cliente'}</small>
+      </div>
+      <button class="btn small ghost" onclick="editarUsuario(${u.id})">✏️</button>
+      <button class="btn small danger" onclick="excluirUsuario(${u.id})">🗑️</button>
+    </div>
+  `).join('');
+}
+
+function abrirModalUsuario() {
+  usuarioEditando = null;
+  document.getElementById('usuarioModalTitle').textContent = '➕ Novo Usuário';
+  document.getElementById('usuarioId').value = '';
+  document.getElementById('uNome').value = '';
+  document.getElementById('uEmail').value = '';
+  document.getElementById('uSenha').value = '';
+  document.getElementById('uTipo').value = 'cliente';
+  document.getElementById('msgUsuario').className = 'msg';
+  abrirModal('mUsuario');
+}
+
+function editarUsuario(id) {
+  const u = usuarios.find(x => x.id == id);
+  if (!u) return;
+  usuarioEditando = u;
+  document.getElementById('usuarioModalTitle').textContent = '✏️ Editar Usuário';
+  document.getElementById('usuarioId').value = u.id;
+  document.getElementById('uNome').value = u.nome || '';
+  document.getElementById('uEmail').value = u.email || '';
+  document.getElementById('uSenha').value = '';
+  document.getElementById('uTipo').value = u.tipo || 'cliente';
+  document.getElementById('msgUsuario').className = 'msg';
+  abrirModal('mUsuario');
+}
+
+async function salvarUsuario() {
+  const id = document.getElementById('usuarioId').value;
+  const dados = {
+    nome: document.getElementById('uNome').value,
+    email: document.getElementById('uEmail').value,
+    senha: document.getElementById('uSenha').value || undefined,
+    tipo: document.getElementById('uTipo').value
+  };
+
+  if (!dados.email) {
+    document.getElementById('msgUsuario').className = 'msg err';
+    document.getElementById('msgUsuario').textContent = 'Email é obrigatório';
+    return;
+  }
+
+  const msg = document.getElementById('msgUsuario');
+  msg.className = 'msg info';
+  msg.textContent = 'Salvando...';
+
+  try {
+    const rota = id ? `/api/gerente/usuarios/${id}` : '/api/gerente/usuarios';
+    const metodo = id ? 'PUT' : 'POST';
+    const r = await fetch(API + rota, {
+      method: metodo,
+      headers: {'Content-Type': 'application/json'},
+      credentials: 'include',
+      body: JSON.stringify(dados)
+    });
+    if (!r.ok) throw new Error('Erro ao salvar');
+    msg.className = 'msg ok';
+    msg.textContent = '✅ Usuário salvo!';
+    setTimeout(() => {
+      fecharModal('mUsuario');
+      toast('✅ Usuário salvo com sucesso!');
+      carregarUsuarios();
+      adicionarLog(`${id ? 'Editado' : 'Criado'} usuário: ${dados.email}`);
+    }, 500);
+  } catch(e) {
+    msg.className = 'msg err';
+    msg.textContent = '❌ Erro ao salvar usuário: ' + e.message;
+  }
+}
+
+async function excluirUsuario(id) {
+  if (!confirm('Tem certeza que deseja excluir este usuário?')) return;
+  try {
+    const r = await fetch(API + '/api/gerente/usuarios/' + id, {
+      method: 'DELETE',
+      credentials: 'include'
+    });
+    if (!r.ok) throw new Error('Erro ao excluir');
+    toast('🗑️ Usuário excluído!');
+    carregarUsuarios();
+    adicionarLog(`Usuário #${id} excluído`);
+  } catch(e) {
+    toast('❌ Erro ao excluir usuário: ' + e.message);
+  }
+}
+
+// ---------- LOGS ----------
+function carregarLogs() {
+  const el = document.getElementById('listaLogs');
+  try {
+    const saved = localStorage.getItem('leblon_logs');
+    logs = saved ? JSON.parse(saved) : [];
+    renderLogs();
+  } catch(e) {
+    el.textContent = '❌ Erro ao carregar logs.';
+  }
+}
+
+function renderLogs() {
+  const el = document.getElementById('listaLogs');
+  if (!logs.length) {
+    el.className = 'vazio';
+    el.textContent = '📭 Nenhum log registrado.';
+    return;
+  }
+  el.className = '';
+  el.innerHTML = logs.slice().reverse().map(log => `
+    <div class="row">
+      <div class="g">
+        <strong>${log.msg}</strong>
+        <small>${new Date(log.data).toLocaleString('pt-BR')}</small>
+      </div>
+    </div>
+  `).join('');
+}
+
+function adicionarLog(msg) {
+  logs.push({msg, data: Date.now()});
+  if (logs.length > 500) logs = logs.slice(-500);
+  localStorage.setItem('leblon_logs', JSON.stringify(logs));
+}
+
+function limparLogs() {
+  if (!confirm('Tem certeza que deseja limpar todos os logs?')) return;
+  logs = [];
+  localStorage.setItem('leblon_logs', JSON.stringify(logs));
+  renderLogs();
+  toast('🗑️ Logs limpos!');
+}
+
+// ---------- STATS ----------
+async function carregarStats() {
+  try {
+    const r = await fetch(API + '/api/gerente/estatisticas', {
+      credentials: 'include'
+    });
+    const d = await r.json();
+    document.getElementById('totalPedidos').textContent = d.total || 0;
+    document.getElementById('totalConfirmados').textContent = d.confirmados || 0;
+    document.getElementById('totalPendentes').textContent = d.pendentes || 0;
+    document.getElementById('totalCancelados').textContent = d.cancelados || 0;
+  } catch(e) {}
+}
+
+// ---------- CHECK LOGIN ----------
+async function verificarLogin() {
+  try {
+    const r = await fetch(API + '/api/gerente/verificar', {
+      credentials: 'include'
+    });
+    if (r.ok) {
+      const d = await r.json();
+      gerenteLogado = true;
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('painelContent').classList.add('active');
+      document.getElementById('gerenteNome').textContent = d.nome || d.email || 'Gerente';
+      carregarConfig();
+      carregarPedidos();
+      carregarProdutos();
+      carregarStreaming();
+      carregarUsuarios();
+      carregarLogs();
+      carregarStats();
+    }
+  } catch(e) {
+    console.log('Não logado');
+  }
+}
+
+// ---------- INIT ----------
+verificarLogin();
+
+// Enter key support
+document.getElementById('loginUsuario').addEventListener('keypress', function(e) {
+  if (e.key === 'Enter') document.getElementById('loginSenha').focus();
+});
+document.getElementById('loginSenha').addEventListener('keypress', function(e) {
+  if (e.key === 'Enter') fazerLogin();
+});
+</script>
+</body>
+</html>

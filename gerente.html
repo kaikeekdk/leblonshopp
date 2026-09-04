@@ -48,15 +48,6 @@ body{margin:0;background:radial-gradient(120% 60% at 50% 0%,#3a1055 0%,var(--bg)
 .status.confirmado{background:#0f3a22;color:#86efac}
 .status.pendente{background:#4c3a10;color:#fde68a}
 .status.cancelado{background:#4c1026;color:#fda4af}
-.config-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-@media(max-width:640px){.config-grid{grid-template-columns:1fr}}
-.config-item{background:var(--card2);border-radius:10px;padding:12px}
-.config-item label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}
-.config-item input,.config-item select{width:100%;background:var(--bg);border:1px solid var(--borda);border-radius:8px;padding:8px 12px;color:var(--texto);font-family:inherit;font-size:14px}
-.config-item input:focus,.config-item select:focus{outline:2px solid var(--roxo)}
-.config-item input[type="color"]{height:44px;padding:4px;cursor:pointer}
-.config-item input[type="file"]{padding:6px}
-.preview-logo{max-height:60px;margin-top:8px;border-radius:8px;background:var(--bg);padding:4px}
 .preview-imagem{max-height:120px;margin:8px 0;border-radius:10px;background:var(--bg);padding:4px;border:1px solid var(--borda)}
 .upload-area{background:var(--bg);border:2px dashed var(--borda);border-radius:10px;padding:20px;text-align:center;cursor:pointer;transition:all .3s;margin-bottom:10px}
 .upload-area:hover{border-color:var(--roxo);background:var(--card)}
@@ -112,7 +103,6 @@ body{margin:0;background:radial-gradient(120% 60% at 50% 0%,#3a1055 0%,var(--bg)
       <button data-tab="streaming">📺 Streaming</button>
       <button data-tab="usuarios">👥 Usuários</button>
       <button data-tab="logs">📋 Logs</button>
-      <button data-tab="config">⚙️ Configurações</button>
     </div>
 
     <!-- PEDIDOS -->
@@ -161,62 +151,6 @@ body{margin:0;background:radial-gradient(120% 60% at 50% 0%,#3a1055 0%,var(--bg)
         <button class="btn danger small" onclick="limparLogs()">🗑️ Limpar Logs</button>
       </div>
       <div id="listaLogs" class="vazio">Carregando logs...</div>
-    </div>
-
-    <!-- CONFIGURAÇÕES -->
-    <div class="panel" id="panelConfig">
-      <div class="card">
-        <h3>🎨 Aparência do Site</h3>
-        <div class="config-grid">
-          <div class="config-item">
-            <label>Logo da Loja</label>
-            <input type="file" id="logoInput" accept="image/*" onchange="uploadLogo(event)" />
-            <img id="logoPreviewConfig" class="preview-logo" src="https://placehold.co/200x80/a855f7/ffffff?text=LEBLON" />
-          </div>
-          <div class="config-item">
-            <label>Nome da Loja</label>
-            <input type="text" id="storeNameInput" value="Leblon Store" onchange="salvarConfig()" />
-          </div>
-          <div class="config-item">
-            <label>Cor Principal</label>
-            <input type="color" id="corPrincipal" value="#a855f7" onchange="salvarConfig()" />
-          </div>
-          <div class="config-item">
-            <label>Cor Secundária</label>
-            <input type="color" id="corSecundaria" value="#7c3aed" onchange="salvarConfig()" />
-          </div>
-          <div class="config-item">
-            <label>Cor de Fundo</label>
-            <input type="color" id="corFundo" value="#0f0620" onchange="salvarConfig()" />
-          </div>
-          <div class="config-item">
-            <label>Cor do Texto</label>
-            <input type="color" id="corTexto" value="#f5ecff" onchange="salvarConfig()" />
-          </div>
-          <div class="config-item">
-            <label>Chave PIX</label>
-            <input type="text" id="chavePixInput" value="615add06-24f5-421f-8ac1-cc3e0a52f60c" onchange="salvarConfig()" />
-          </div>
-          <div class="config-item">
-            <label>WhatsApp (com DDD)</label>
-            <input type="text" id="whatsappInput" value="5511999999999" onchange="salvarConfig()" />
-          </div>
-        </div>
-        <button class="btn" onclick="salvarConfig()" style="margin-top:12px">💾 Salvar Configurações</button>
-        <button class="btn ghost" onclick="resetarConfig()" style="margin-top:8px;margin-left:8px">↩️ Restaurar Padrão</button>
-      </div>
-      <div class="card">
-        <h3>📊 Estatísticas</h3>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px">
-          <div class="config-item"><strong>Total Pedidos</strong><br><span id="totalPedidos">0</span></div>
-          <div class="config-item"><strong>Confirmados</strong><br><span id="totalConfirmados">0</span></div>
-          <div class="config-item"><strong>Pendentes</strong><br><span id="totalPendentes">0</span></div>
-          <div class="config-item"><strong>Cancelados</strong><br><span id="totalCancelados">0</span></div>
-          <div class="config-item"><strong>Total Usuários</strong><br><span id="totalUsuarios">0</span></div>
-          <div class="config-item"><strong>Total Produtos</strong><br><span id="totalProdutos">0</span></div>
-          <div class="config-item"><strong>Total Streaming</strong><br><span id="totalStreaming">0</span></div>
-        </div>
-      </div>
     </div>
   </main>
 </div>
@@ -306,7 +240,6 @@ body{margin:0;background:radial-gradient(120% 60% at 50% 0%,#3a1055 0%,var(--bg)
 const API = location.port === '5000' || location.protocol === 'file:' ? 'http://localhost:5000' : '';
 let produtos = [], pedidos = [], usuarios = [], streaming = [], logs = [];
 let filtroPedido = 'todos', produtoEditando = null, usuarioEditando = null, streamingEditando = null;
-let config = {};
 let gerenteLogado = false;
 let pedidoSelecionado = null;
 let imagemBase64 = null;
@@ -346,13 +279,11 @@ async function fazerLogin() {
     document.getElementById('painelContent').classList.add('active');
     document.getElementById('gerenteNome').textContent = d.usuario?.nome || 'Gerente';
 
-    carregarConfig();
     carregarPedidos();
     carregarProdutos();
     carregarStreaming();
     carregarUsuarios();
     carregarLogs();
-    carregarStats();
 
   } catch(e) {
     msg.className = 'msg err';
@@ -398,79 +329,8 @@ document.querySelectorAll('#tabs button').forEach(b => {
     if (b.dataset.tab === 'streaming') carregarStreaming();
     if (b.dataset.tab === 'usuarios') carregarUsuarios();
     if (b.dataset.tab === 'logs') carregarLogs();
-    if (b.dataset.tab === 'config') carregarStats();
   };
 });
-
-// ---------- CONFIG ----------
-function carregarConfig() {
-  try {
-    const saved = localStorage.getItem('leblon_config');
-    if (saved) {
-      config = JSON.parse(saved);
-      aplicarConfig();
-    }
-  } catch(e) {}
-}
-
-function aplicarConfig() {
-  const root = document.documentElement;
-  if (config.corPrincipal) root.style.setProperty('--roxo', config.corPrincipal);
-  if (config.corSecundaria) root.style.setProperty('--roxo-forte', config.corSecundaria);
-  if (config.corFundo) root.style.setProperty('--bg', config.corFundo);
-  if (config.corTexto) root.style.setProperty('--texto', config.corTexto);
-  if (config.nomeLoja) document.getElementById('storeNameInput').value = config.nomeLoja;
-  if (config.logo) document.getElementById('logoPreviewConfig').src = config.logo;
-  if (config.chavePix) document.getElementById('chavePixInput').value = config.chavePix;
-  if (config.whatsapp) document.getElementById('whatsappInput').value = config.whatsapp;
-
-  document.getElementById('corPrincipal').value = config.corPrincipal || '#a855f7';
-  document.getElementById('corSecundaria').value = config.corSecundaria || '#7c3aed';
-  document.getElementById('corFundo').value = config.corFundo || '#0f0620';
-  document.getElementById('corTexto').value = config.corTexto || '#f5ecff';
-}
-
-function salvarConfig() {
-  config.nomeLoja = document.getElementById('storeNameInput').value;
-  config.corPrincipal = document.getElementById('corPrincipal').value;
-  config.corSecundaria = document.getElementById('corSecundaria').value;
-  config.corFundo = document.getElementById('corFundo').value;
-  config.corTexto = document.getElementById('corTexto').value;
-  config.chavePix = document.getElementById('chavePixInput').value;
-  config.whatsapp = document.getElementById('whatsappInput').value;
-
-  localStorage.setItem('leblon_config', JSON.stringify(config));
-  aplicarConfig();
-  toast('✅ Configurações salvas!');
-}
-
-function resetarConfig() {
-  localStorage.removeItem('leblon_config');
-  config = {};
-  document.getElementById('storeNameInput').value = 'Leblon Store';
-  document.getElementById('corPrincipal').value = '#a855f7';
-  document.getElementById('corSecundaria').value = '#7c3aed';
-  document.getElementById('corFundo').value = '#0f0620';
-  document.getElementById('corTexto').value = '#f5ecff';
-  document.getElementById('chavePixInput').value = '615add06-24f5-421f-8ac1-cc3e0a52f60c';
-  document.getElementById('whatsappInput').value = '5511999999999';
-  document.getElementById('logoPreviewConfig').src = 'https://placehold.co/200x80/a855f7/ffffff?text=LEBLON';
-  salvarConfig();
-  toast('↩️ Configurações restauradas!');
-}
-
-function uploadLogo(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function(ev) {
-    config.logo = ev.target.result;
-    document.getElementById('logoPreviewConfig').src = ev.target.result;
-    localStorage.setItem('leblon_config', JSON.stringify(config));
-    toast('✅ Logo atualizada!');
-  };
-  reader.readAsDataURL(file);
-}
 
 // ---------- UPLOAD IMAGEM ----------
 function previewImagemProduto(event) {
@@ -623,7 +483,6 @@ async function confirmarPedidoDetalhes() {
     fecharModal('mDetalhes');
     toast('✅ Pedido #' + pedidoSelecionado.id + ' confirmado!');
     carregarPedidos();
-    carregarStats();
     adicionarLog(`Pedido #${pedidoSelecionado.id} confirmado por ${pedidoSelecionado.nome}`);
   } catch(e) {
     toast('❌ Erro ao confirmar pedido: ' + e.message);
@@ -643,7 +502,6 @@ async function cancelarPedidoDetalhes() {
     fecharModal('mDetalhes');
     toast('❌ Pedido #' + pedidoSelecionado.id + ' cancelado!');
     carregarPedidos();
-    carregarStats();
     adicionarLog(`Pedido #${pedidoSelecionado.id} cancelado por ${pedidoSelecionado.nome}`);
   } catch(e) {
     toast('❌ Erro ao cancelar pedido: ' + e.message);
@@ -662,7 +520,6 @@ async function excluirPedidoDetalhes() {
     fecharModal('mDetalhes');
     toast('🗑️ Pedido #' + pedidoSelecionado.id + ' excluído permanentemente!');
     carregarPedidos();
-    carregarStats();
     adicionarLog(`Pedido #${pedidoSelecionado.id} excluído permanentemente por ${pedidoSelecionado.nome}`);
   } catch(e) {
     toast('❌ Erro ao excluir pedido: ' + e.message);
@@ -683,7 +540,6 @@ async function carregarProdutos() {
     const d2 = await r2.json();
     produtos = [...(d1.erro ? [] : d1), ...(d2.erro ? [] : d2)];
     renderProdutos();
-    document.getElementById('totalProdutos').textContent = produtos.length;
   } catch(e) {
     el.textContent = '❌ Erro ao carregar produtos.';
   }
@@ -824,7 +680,6 @@ async function carregarStreaming() {
     const d = await r.json();
     streaming = d.erro ? [] : d;
     renderStreaming();
-    document.getElementById('totalStreaming').textContent = streaming.length;
   } catch(e) {
     el.textContent = '❌ Erro ao carregar streaming: ' + e.message;
   }
@@ -965,7 +820,6 @@ async function carregarUsuarios() {
     const d = await r.json();
     usuarios = d.erro ? [] : d;
     renderUsuarios();
-    document.getElementById('totalUsuarios').textContent = usuarios.length;
   } catch(e) {
     el.textContent = '❌ Erro ao carregar usuários: ' + e.message;
   }
@@ -1121,20 +975,6 @@ function limparLogs() {
   toast('🗑️ Logs limpos!');
 }
 
-// ---------- STATS ----------
-async function carregarStats() {
-  try {
-    const r = await fetch(API + '/api/gerente/estatisticas', {
-      credentials: 'include'
-    });
-    const d = await r.json();
-    document.getElementById('totalPedidos').textContent = d.total || 0;
-    document.getElementById('totalConfirmados').textContent = d.confirmados || 0;
-    document.getElementById('totalPendentes').textContent = d.pendentes || 0;
-    document.getElementById('totalCancelados').textContent = d.cancelados || 0;
-  } catch(e) {}
-}
-
 // ---------- CHECK LOGIN ----------
 async function verificarLogin() {
   try {
@@ -1147,13 +987,11 @@ async function verificarLogin() {
       document.getElementById('loginScreen').style.display = 'none';
       document.getElementById('painelContent').classList.add('active');
       document.getElementById('gerenteNome').textContent = d.nome || d.email || 'Gerente';
-      carregarConfig();
       carregarPedidos();
       carregarProdutos();
       carregarStreaming();
       carregarUsuarios();
       carregarLogs();
-      carregarStats();
     }
   } catch(e) {
     console.log('Não logado');

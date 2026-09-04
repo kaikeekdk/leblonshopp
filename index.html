@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#2a0a3d" />
-<title>Leblon Store — Produtos, Pedidos e Pagamento PIX</title>
+<title>Leblon — Produtos, Pedidos e Pagamento PIX</title>
 <meta name="description" content="Leblon Store: produtos exclusivos, pedidos e pagamento PIX. Área +18 separada." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -109,7 +109,7 @@ input:focus{outline:2px solid var(--roxo);border-color:transparent}
 <body>
 
 <header>
-  <div class="logo">leblon <span>store</span></div>
+  <div class="logo">leblon</div>
   <div class="spacer"></div>
   <div class="profile-area">
     <button class="profile-18" id="btn18">🔞 18+</button>
@@ -121,7 +121,7 @@ input:focus{outline:2px solid var(--roxo);border-color:transparent}
   <!-- VIEW LOJA -->
   <section id="viewLoja">
     <div class="hero">
-      <h1>✨ Bem-vindo à Leblon Store</h1>
+      <h1>✨ Bem-vindo à Leblon</h1>
       <p>Produtos exclusivos, pedido rápido e pagamento por PIX.</p>
     </div>
     <div class="chips" id="chips"></div>
@@ -212,7 +212,9 @@ input:focus{outline:2px solid var(--roxo);border-color:transparent}
 <div class="modal" id="mAdulto">
   <div class="sheet">
     <h2>🔞 Conteúdo +18</h2>
-    <p style="color:var(--muted);font-size:14px">Você tem 18 anos ou mais? Clique abaixo para acessar.</p>
+    <div class="msg" id="msgAdulto"></div>
+    <p style="color:var(--muted);font-size:14px;margin-bottom:10px">⚠️ Este conteúdo é restrito para maiores de 18 anos.</p>
+    <p style="color:var(--muted);font-size:13px;margin-bottom:16px">Você confirma que tem 18 anos ou mais e deseja acessar?</p>
     <button class="btn full" onclick="acessarAdulto()">✅ Sim, tenho 18+</button>
     <button class="btn ghost full" style="margin-top:8px" onclick="fechar('mAdulto')">Voltar</button>
   </div>
@@ -225,6 +227,7 @@ let streamingProdutos = [];
 let filtro = 'Todos', filtroStreaming = 'Todos';
 let carrinho = [], usuario = null, chavePix = '615add06-24f5-421f-8ac1-cc3e0a52f60c';
 let mostrarAdulto = false;
+let adultoAcessado = false;
 
 const $ = s => document.querySelector(s);
 const abrir = id => $('#'+id).classList.add('on');
@@ -298,7 +301,17 @@ function renderChips(){
   }).join('');
 
   $('#chips').querySelectorAll('.chip').forEach(b=>b.onclick=()=>{
-    if(b.dataset.cat === '+18' && !mostrarAdulto){ abrir('mAdulto'); return; }
+    if(b.dataset.cat === '+18'){
+      if(mostrarAdulto) {
+        // Já está ativado, só muda o filtro
+        filtro = b.dataset.cat;
+        renderChips();
+        renderGrid();
+      } else {
+        abrir('mAdulto');
+      }
+      return;
+    }
     filtro = b.dataset.cat;
     renderChips();
     renderGrid();
@@ -347,12 +360,21 @@ function renderGrid(){
 }
 
 function acessarAdulto(){
-  fechar('mAdulto');
+  adultoAcessado = true;
   mostrarAdulto = true;
   $('#btn18').classList.add('active');
   $('#btn18').textContent = '🔞 18+ ON';
-  filtro = 'Todos';
+  filtro = '+18';
+  fechar('mAdulto');
   carregar();
+  // Mostrar mensagem de confirmação
+  const msg = document.getElementById('msgAdulto');
+  msg.className = 'msg ok';
+  msg.textContent = '✅ Conteúdo +18 liberado!';
+  setTimeout(() => {
+    msg.className = 'msg';
+    msg.textContent = '';
+  }, 3000);
 }
 
 // ---------- STREAMING ----------
@@ -492,7 +514,7 @@ $('#btnFinalizar').onclick = ()=>{
   fechar('mCarrinho');
   const total = totalCarrinho();
   $('#valorPix').textContent = brl(total);
-  const qrData = `00020126580014br.gov.bcb.pix0136${chavePix}5204000053039865405${total.toFixed(2)}5802BR5925Leblon Store6009SAO PAULO6108054090006304E847`;
+  const qrData = `00020126580014br.gov.bcb.pix0136${chavePix}5204000053039865405${total.toFixed(2)}5802BR5925Leblon6009SAO PAULO6108054090006304E847`;
   $('#qrPix').src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(qrData)}`;
   const msgWhats = `Olá! Meu pedido: ${carrinho.map(i=>`${i.qtd}x ${i.nome}`).join(', ')} - Total ${brl(total)}. Comprovante anexo.`;
   $('#whatsappLink').href = `https://wa.me/5511999999999?text=${encodeURIComponent(msgWhats)}`;
@@ -542,6 +564,7 @@ async function carregarPedidos(){
 $('#btn18').onclick = ()=>{
   if(mostrarAdulto) {
     mostrarAdulto = false;
+    adultoAcessado = false;
     $('#btn18').classList.remove('active');
     $('#btn18').textContent = '🔞 18+';
     filtro = 'Todos';
@@ -554,5 +577,4 @@ $('#btn18').onclick = ()=>{
 };
 </script>
 </body>
-</html>
 </html>
